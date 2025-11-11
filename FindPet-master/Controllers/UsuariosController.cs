@@ -7,7 +7,6 @@ public class UsuariosController : ControllerBase
 {
     private readonly UsuarioService _usuarioService;
 
-    // O .NET injeta o serviço automaticamente aqui
     public UsuariosController(UsuarioService usuarioService)
     {
         _usuarioService = usuarioService;
@@ -16,18 +15,45 @@ public class UsuariosController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Post([FromBody] Usuario novoUsuario)
     {
-        // Validação básica (pode ser melhorada com FluentValidation, por exemplo)
+        // ... seu método Post (criar usuário) que já existe ...
+        // [código omitido para breveidade]
         if (novoUsuario == null || string.IsNullOrEmpty(novoUsuario.Email))
         {
             return BadRequest("Dados de usuário inválidos.");
         }
-
-        // Remove o Id, pois o MongoDB irá gerar um novo
         novoUsuario.Id = null;
-
         await _usuarioService.CreateAsync(novoUsuario);
-
-        // Retorna um status 201 Created com o usuário recém-criado
         return CreatedAtAction(nameof(Post), new { id = novoUsuario.Id }, novoUsuario);
+    }
+
+    // ==================================================
+    // == ADICIONE ESTE NOVO MÉTODO AQUI ==
+    // ==================================================
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(string id, [FromBody] Usuario usuarioComEndereco)
+    {
+        // 1. Busca o usuário que foi criado na Tela 1
+        var usuarioExistente = await _usuarioService.GetAsync(id);
+
+        if (usuarioExistente is null)
+        {
+            return NotFound("Usuário não encontrado para adicionar endereço.");
+        }
+
+        // 2. Atualiza SOMENTE os campos de endereço
+        usuarioExistente.CEP = usuarioComEndereco.CEP;
+        usuarioExistente.Rua = usuarioComEndereco.Rua;
+        usuarioExistente.Bairro = usuarioComEndereco.Bairro;
+        usuarioExistente.Cidade = usuarioComEndereco.Cidade;
+        usuarioExistente.Numero = usuarioComEndereco.Numero;
+        usuarioExistente.Complemento = usuarioComEndereco.Complemento;
+        usuarioExistente.Estado = usuarioComEndereco.Estado;
+        usuarioExistente.Pais = usuarioComEndereco.Pais;
+
+        // 3. Salva o usuário completo de volta no banco
+        await _usuarioService.UpdateAsync(id, usuarioExistente);
+
+        // Retorna "Sem Conteúdo", que é o padrão para PUT/UPDATE bem-sucedido
+        return NoContent(); 
     }
 }

@@ -3,12 +3,12 @@
 // 1. Espera o HTML ser completamente carregado para executar o script
 document.addEventListener('DOMContentLoaded', function () {
 
-
-    
-
     // 2. Pega os elementos do HTML pelos seus IDs
+    // **** CORRIGIDO: O ID do formulário agora é 'form-cadastro' ****
     const form = document.getElementById('form-cadastro');
-    const mensagemDiv = document.getElementById('mensagem');
+    
+    // **** CORRIGIDO: O ID da div de mensagem agora é 'mensagem-status' ****
+    const mensagemDiv = document.getElementById('mensagem-status');
 
     // 3. Adiciona um "escutador" para o evento de 'submit' do formulário
     form.addEventListener('submit', function (event) {
@@ -17,16 +17,22 @@ document.addEventListener('DOMContentLoaded', function () {
         event.preventDefault();
 
         // 5. Coleta os dados dos campos do formulário
+        // **** CORRIGIDO: IDs com letra maiúscula e todos os campos adicionados ****
         const dadosDoUsuario = {
-            nome: document.getElementById('nome').value,
-            email: document.getElementById('email').value,
-            senha: document.getElementById('senha').value
+            // As chaves (Nome, Email...) devem ser IGUAIS às do seu Models/Usuario.cs
+            Nome: document.getElementById('Nome').value,
+            Email: document.getElementById('Email').value,
+            Senha: document.getElementById('Senha').value,
+            CPF: document.getElementById('CPF').value,
+            Telefone: document.getElementById('Telefone').value,
+            DatadeNascimento: document.getElementById('DataNascimento').value
         };
 
         // Mostra os dados no console para depuração (opcional)
         console.log('Dados a serem enviados:', dadosDoUsuario);
 
         // 6. Envia os dados para a API usando o 'fetch'
+        // A URL /api/Usuarios está CORRETA, pois seu controller é [Route("api/[controller]")]
         fetch('/api/Usuarios', {
             method: 'POST', // O método HTTP
             headers: {
@@ -38,16 +44,20 @@ document.addEventListener('DOMContentLoaded', function () {
             // 7. Verifica se a resposta da API foi bem-sucedida
             if (!response.ok) {
                 // Se não foi OK (ex: erro 400 ou 500), lança um erro para cair no .catch()
-                return response.json().then(err => { throw new Error(err.title || 'Ocorreu um erro no cadastro.') });
+                return response.text().then(text => { throw new Error('Erro do servidor: ' + text) });
             }
             return response.json(); // Converte a resposta da API de JSON para objeto
         })
         .then(data => {
-            // 8. Se tudo deu certo (caiu aqui), mostra uma mensagem de sucesso
-            console.log('Sucesso:', data);
-            mensagemDiv.textContent = 'Usuário cadastrado com sucesso! ID: ' + data.id;
-            mensagemDiv.style.color = 'green';
-            form.reset(); // Limpa o formulário
+            // 8. Se tudo deu certo (caiu aqui):
+            console.log('Sucesso Tela 1:', data);
+            
+            // 9. SALVA o ID do usuário no navegador
+            // (sessionStorage é limpo quando o navegador fecha)
+            sessionStorage.setItem('usuarioIdParaCadastro', data.id);
+
+            // 10. REDIRECIONA para a tela 2
+            window.location.href = '/TelaCadastro2';
         })
         .catch(error => {
             // 9. Se algo deu errado (caiu aqui), mostra uma mensagem de erro

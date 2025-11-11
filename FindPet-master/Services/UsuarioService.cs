@@ -1,29 +1,35 @@
 // Em Services/UsuarioService.cs
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using FindPet.Settings;
+// Referencie o seu modelo de Usuario (se estiver em outro namespace, ajuste)
+// using FindPet.Models; 
 
 public class UsuarioService
 {
     private readonly IMongoCollection<Usuario> _usuariosCollection;
 
-    // O construtor recebe a configuração do appsettings.json
     public UsuarioService(IOptions<MongoDbSettings> mongoDbSettings)
     {
-        // Cria um novo cliente MongoDB com a string de conexão
         var mongoClient = new MongoClient(mongoDbSettings.Value.ConnectionString);
-
-        // Obtém uma referência ao banco de dados
         var mongoDatabase = mongoClient.GetDatabase(mongoDbSettings.Value.DatabaseName);
-
-        // Obtém uma referência à coleção "Usuarios" (se não existir, será criada)
-        _usuariosCollection = mongoDatabase.GetCollection<Usuario>("Usuarios");
+        _usuariosCollection = mongoDatabase.GetCollection<Usuario>(mongoDbSettings.Value.CollectionName);
     }
 
-    // Método para criar (cadastrar) um novo usuário
+    // MÉTODO DE CRIAR (POST) - Este você já tinha
     public async Task CreateAsync(Usuario novoUsuario) =>
         await _usuariosCollection.InsertOneAsync(novoUsuario);
 
-    // Você pode adicionar outros métodos aqui (Get, Update, Delete)
-    // Ex: public async Task<Usuario?> GetAsync(string id) =>
-    //        await _usuariosCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
+    // ==================================================
+    // == ADICIONE ESTES DOIS NOVOS MÉTODOS AQUI ==
+    // ==================================================
+
+    // MÉTODO PARA BUSCAR UM (GET por ID)
+    public async Task<Usuario?> GetAsync(string id) =>
+        await _usuariosCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
+
+    // MÉTODO PARA ATUALIZAR (PUT)
+    public async Task UpdateAsync(string id, Usuario usuarioAtualizado) =>
+        await _usuariosCollection.ReplaceOneAsync(x => x.Id == id, usuarioAtualizado);
+
 }

@@ -1,6 +1,9 @@
-// Crie este arquivo, pode ser na raiz do projeto ou numa pasta "Settings"
-public class MongoDbSettings
+namespace FindPet.Settings
 {
-    public string ConnectionString { get; set; } = null!;
-    public string DatabaseName { get; set; } = null!;
+    public class MongoDbSettings
+    {
+        public string ConnectionString { get; set; } = string.Empty;
+        public string DatabaseName { get; set; } = string.Empty;
+        public string CollectionName { get; set; } = string.Empty;
+    }
 }
