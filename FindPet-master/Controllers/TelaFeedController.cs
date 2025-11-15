@@ -1,45 +1,27 @@
 using Microsoft.AspNetCore.Mvc;
+using findPet.Interfaces;
+using findPet.Services;
 using findPet.Models;
 using System.Text.Json;
 using Newtonsoft.Json;
 
 namespace findPet.Controllers
 {
-    public class TelaFeedController : Controller
+    public class TelaFeedController : Controller, IObserver
     {
-        // Lista estática para simular um banco de dados
-        private static List<TelaFeedModel> _publicacoes = new List<TelaFeedModel>();
-        private static int _proximoId = 1;
+        private readonly PublicacaoManager _publicacaoManager;
+
+        public TelaFeedController()
+        {
+            _publicacaoManager = PublicacaoManager.Instance;
+            _publicacaoManager.Attach(this); // O Controller se registra como Observer
+        }
 
         [HttpGet]
         public IActionResult Index()
         {
-            // Verifica se há uma nova publicação vinda do TempData
-            if (TempData.ContainsKey("TelaPublicacaoModel"))
-            {
-                var publicacaoData = JsonConvert.DeserializeObject<TelaPublicacaoFeed>((string)TempData["TelaPublicacaoModel"]);
-                
-                // Converte para TelaFeedModel e adiciona à lista
-                var novaPublicacao = new TelaFeedModel
-                {
-                    Id = _proximoId++,
-                    Nome = publicacaoData.Nome,
-                    Raca = publicacaoData.Raca,
-                    Cor = publicacaoData.Cor,
-                    Porte = publicacaoData.Porte,
-                    LocalDesaparecimento = publicacaoData.LocalDesaparecimento,
-                    DataDesaparecimento = publicacaoData.DataDesaparecimento,
-                    Chip = publicacaoData.Chip,
-                    Legenda = publicacaoData.Legenda,
-                    ImageFileName = publicacaoData.ImageFileName,
-                    DataPublicacao = DateTime.Now
-                };
-
-                _publicacoes.Insert(0, novaPublicacao); // Adiciona no início da lista
-            }
-
-            // Ordena as publicações por data (mais recentes primeiro)
-            var publicacoesOrdenadas = _publicacoes.OrderByDescending(p => p.DataPublicacao).ToList();
+            // O feed agora obtém as publicações do PublicacaoManager
+            var publicacoesOrdenadas = _publicacaoManager.ObterPublicacoesOrdenadas();
             
             return View(publicacoesOrdenadas);
         }
@@ -47,11 +29,8 @@ namespace findPet.Controllers
         [HttpPost]
         public IActionResult Curtir(int publicacaoId)
         {
-            var publicacao = _publicacoes.FirstOrDefault(p => p.Id == publicacaoId);
-            if (publicacao != null)
-            {
-                publicacao.Curtidas++;
-            }
+            _publicacaoManager.IncrementarCurtidas(publicacaoId);
+            var publicacao = _publicacaoManager.ObterPublicacaoPorId(publicacaoId);
 
             return Json(new { success = true, curtidas = publicacao?.Curtidas ?? 0 });
         }
@@ -59,19 +38,14 @@ namespace findPet.Controllers
         [HttpPost]
         public IActionResult Comentar(int publicacaoId, string textoComentario, string nomeUsuario = "Usuário Anônimo")
         {
-            var publicacao = _publicacoes.FirstOrDefault(p => p.Id == publicacaoId);
-            if (publicacao != null && !string.IsNullOrWhiteSpace(textoComentario))
+            var novoComentario = new Comentario
             {
-                var novoComentario = new Comentario
-                {
-                    Id = publicacao.Comentarios.Count + 1,
-                    NomeUsuario = nomeUsuario,
-                    Texto = textoComentario,
-                    DataComentario = DateTime.Now
-                };
+                NomeUsuario = nomeUsuario,
+                Texto = textoComentario
+            };
 
-                publicacao.Comentarios.Add(novoComentario);
-            }
+            _publicacaoManager.AdicionarComentario(publicacaoId, novoComentario);
+            var publicacao = _publicacaoManager.ObterPublicacaoPorId(publicacaoId);
 
             return Json(new { 
                 success = true, 
@@ -83,11 +57,8 @@ namespace findPet.Controllers
         [HttpPost]
         public IActionResult Compartilhar(int publicacaoId)
         {
-            var publicacao = _publicacoes.FirstOrDefault(p => p.Id == publicacaoId);
-            if (publicacao != null)
-            {
-                publicacao.Compartilhamentos++;
-            }
+            _publicacaoManager.IncrementarCompartilhamentos(publicacaoId);
+            var publicacao = _publicacaoManager.ObterPublicacaoPorId(publicacaoId);
 
             return Json(new { success = true, compartilhamentos = publicacao?.Compartilhamentos ?? 0 });
         }
@@ -95,7 +66,7 @@ namespace findPet.Controllers
         [HttpGet]
         public IActionResult ObterComentarios(int publicacaoId)
         {
-            var publicacao = _publicacoes.FirstOrDefault(p => p.Id == publicacaoId);
+            var publicacao = _publicacaoManager.ObterPublicacaoPorId(publicacaoId);
             if (publicacao != null)
             {
                 return Json(new { 
@@ -110,6 +81,17 @@ namespace findPet.Controllers
             }
 
             return Json(new { success = false });
+        }
+
+        // Implementação do método Update da interface IObserver
+        public void Update(TelaFeedModel publicacao)
+        {
+            // Este método é chamado quando uma nova publicação é feita.
+            // Como o feed já obtém a lista completa do PublicacaoManager no Index(),
+            // a notificação aqui serve apenas para manter o Controller ciente da mudança,
+            // mas não requer uma ação imediata de atualização de estado interno,
+            // pois o estado é centralizado no PublicacaoManager.
+            // Em um cenário real com SignalR, este seria o ponto para enviar a notificação em tempo real.
         }
     }
 }

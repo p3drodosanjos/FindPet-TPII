@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using findPet.Interfaces;
 
 namespace findPet.Models
 {

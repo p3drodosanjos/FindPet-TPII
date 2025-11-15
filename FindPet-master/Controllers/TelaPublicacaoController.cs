@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using findPet.Services;
 using findPet.Models;
 using Newtonsoft.Json;
 
@@ -9,6 +10,8 @@ namespace findPet.Controllers
         [HttpPost]
         public IActionResult Create(TelaPublicacaoModel model)
         {
+            var publicacaoManager = PublicacaoManager.Instance;
+
             if (model != null)
             {
                 if (model.Imagem != null && model.Imagem.Length > 0)
@@ -27,7 +30,23 @@ namespace findPet.Controllers
                     model.ImageFileName = fileNameId;
                 }
 
-                TempData["TelaPublicacaoModel"] = JsonConvert.SerializeObject(model);
+                // Cria o modelo de feed a partir do modelo de publicação
+                var novaPublicacao = new TelaFeedModel
+                {
+                    Nome = model.Nome,
+                    Raca = model.Raca,
+                    Cor = model.Cor,
+                    Porte = model.Porte,
+                    LocalDesaparecimento = model.LocalDesaparecimento,
+                    DataDesaparecimento = model.DataDesaparecimento,
+                    Chip = model.Chip,
+                    Legenda = model.Legenda,
+                    ImageFileName = model.ImageFileName
+                };
+
+                // Adiciona a publicação e notifica os Observers (TelaFeedController)
+                publicacaoManager.AdicionarPublicacao(novaPublicacao);
+
                 return RedirectToAction("Index", "TelaFeed");
             }
 
