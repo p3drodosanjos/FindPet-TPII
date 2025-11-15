@@ -1,0 +1,32 @@
+#Estágio 1: Build da Aplicação
+#Usamos o SDK completo do .NET 8 para compilar o projeto
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /source
+
+#Copia TUDO primeiro.
+#Isso garante que o processo de restore (passo 2) tenha 100% de
+#visibilidade de todos os arquivos, evitando erros de pacotes não encontrados.
+COPY . .
+
+#Restaura as dependências (pacotes NuGet).
+RUN dotnet restore
+
+#Publica a aplicação.
+#Compila o projeto em modo Release e prepara os arquivos para produção.
+#Usamos *.csproj para funcionar com o nome do seu projeto (FindPet.csproj).
+RUN dotnet publish *.csproj -c Release -o /app/publish
+
+
+#Estágio 2: Imagem Final (Runtime)
+#Usamos a imagem leve do ASP.NET, que só contém o necessário para rodar.
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+WORKDIR /app
+
+#Copia apenas os arquivos publicados do estágio de build.
+COPY --from=build /app/publish .
+
+#Expõe a porta 8080 (padrão do .NET em contêineres).
+EXPOSE 8080
+
+#Define o comando para iniciar a aplicação.
+ENTRYPOINT ["dotnet", "FindPet.dll"]
