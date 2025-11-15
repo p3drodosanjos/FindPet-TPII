@@ -1,3 +1,4 @@
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers 
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -24,7 +25,7 @@
         <img class="gato" src="/imagem/gatoroxo.png" alt="Gato">
     </div>
 
-    <form id="form-cadastro-endereco" class="form-container">
+    <form id="form-cadastro-endereco" class="form-container" asp-controller="TelaCadastro2" asp-action="Create" method="post">
         <div class="form-text">
             <h2>Endereço</h2> </div>
         <hr class="divider" />
