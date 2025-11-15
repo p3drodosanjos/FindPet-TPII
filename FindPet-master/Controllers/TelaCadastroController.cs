@@ -1,23 +1,35 @@
 using Microsoft.AspNetCore.Mvc;
-using findPet.Models;
+using FindPet.Models; // <<< CORRIGIDO (de 'findPet' para 'FindPet')
 
-namespace findPet.Controllers
+namespace FindPet.Controllers // <<< CORRIGIDO (de 'findPet' para 'FindPet')
 {
     public class TelaCadastroController : Controller
     {
-       [HttpPost]
-    public IActionResult Create(telaCadastroModel model)
-    {
-        // Aqui voc� pode processar os dados do formul�rio, salvar no banco, etc.
-        
-        // Redireciona para a TelaCadastro2 ap�s o submit
-        return RedirectToAction("Index", "TelaCadastro2");
-    }
+        [HttpGet]
+        public IActionResult Index()
+        {
+            return View();
+        }
 
-    [HttpGet]
-    public IActionResult Index()
-    {
-        return View();
-    }
+        [HttpPost]
+        public IActionResult Create(TelaCadastroModel model) // <<< CORRIGIDO (de 'telaCadastroModel' para 'TelaCadastroModel')
+        {
+            // Aqui você pode processar os dados do formulário, salvar no banco, etc.
+
+            // Redireciona para a TelaCadastro2 após o submit
+            return RedirectToAction("Index", "TelaCadastro2");
+        }
+
+        [HttpPost]
+        public IActionResult Index(TelaCadastroModel model) // <<< CORRIGIDO (de 'telaCadastroModel' para 'TelaCadastroModel')
+        {
+            if (ModelState.IsValid)
+            {
+                // Aqui você pode processar os dados do formulário da TelaCadastro
+                return RedirectToAction("Index", "TelaCadastro2"); // Redireciona para a próxima etapa
+            }
+
+            return View();
+        }
     }
 }

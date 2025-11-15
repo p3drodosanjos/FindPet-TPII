@@ -1,10 +1,20 @@
 using Microsoft.AspNetCore.Mvc;
-using findPet.Models;
+using FindPet.Models; // <<< CORRIGIDO: Deve ser "FindPet" (F maiúsculo)
+using FindPet.Interfaces; // <<< ADICIONADO: Para usar o ICepService
+using System.Threading.Tasks; // <<< ADICIONADO: Para usar 'async Task'
 
-namespace findPet.Controllers
+namespace FindPet.Controllers // <<< CORRIGIDO: Deve ser "FindPet" (F maiúsculo)
 {
     public class TelaCadastro2Controller : Controller
     {
+        private readonly ICepService _cepService;
+
+        // Construtor para Injeção de Dependência
+        public TelaCadastro2Controller(ICepService cepService)
+        {
+            _cepService = cepService;
+        }
+
         [HttpGet]
         public IActionResult Index()
         {
@@ -12,24 +22,43 @@ namespace findPet.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(telaCadastro2Model model)
+        public IActionResult Create(TelaCadastro2Model model) // <<< CORRIGIDO: Nome da classe (T maiúsculo)
         {
-        // Aqui voc� pode processar os dados do formul�rio, salvar no banco, etc.
-        
-        // Redireciona para a TelaCadastro2 ap�s o submit
-        return RedirectToAction("Index", "TelaLogin");
+            // Aqui você pode processar os dados do formulário, salvar no banco, etc.
+
+            // Redireciona para a TelaLogin após o submit
+            return RedirectToAction("Index", "TelaLogin");
         }
 
         [HttpPost]
-        public IActionResult Index(telaCadastro2Model model)
+        public IActionResult Index(TelaCadastro2Model model) // <<< CORRIGIDO: Nome da classe (T maiúsculo)
         {
             if (ModelState.IsValid)
             {
-                // Aqui voc� pode processar os dados do formul�rio da TelaCadastro2
-                return RedirectToAction("Success"); // Pode redirecionar para uma p�gina de sucesso
+                // Aqui você pode processar os dados do formulário da TelaCadastro2
+                return RedirectToAction("Success"); // Pode redirecionar para uma página de sucesso
             }
 
             return View();
+        }
+
+        // Endpoint da API de CEP (do passo anterior)
+        [HttpGet("api/buscar-cep/{cep}")]
+        public async Task<IActionResult> BuscarCep(string cep)
+        {
+            if (string.IsNullOrWhiteSpace(cep))
+            {
+                return BadRequest("CEP não pode ser nulo.");
+            }
+
+            var endereco = await _cepService.BuscarPorCep(cep);
+
+            if (endereco == null)
+            {
+                return NotFound("CEP não encontrado.");
+            }
+
+            return Ok(endereco);
         }
     }
 }

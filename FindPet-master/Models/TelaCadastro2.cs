@@ -1,6 +1,6 @@
-namespace findPet.Models
+namespace FindPet.Models
 {
-    public class telaCadastro2Model
+    public class TelaCadastro2Model
     {
         public required string CEP { get; set; }
         public required string Rua { get; set; }
