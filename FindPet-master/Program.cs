@@ -5,6 +5,7 @@
 using FindPet.Settings; 
 using FindPet.Interfaces; // <<< ADICIONADO: Para a ICepService
 using FindPet.Services;   // <<< ADICIONADO: Para o ViaCepAdapter e UsuarioService
+using FindPet.Builders; // <<< ADICIONE O NAMESPACE DO BUILDER
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,7 +34,12 @@ builder.Services.AddHttpClient(); // <<< ADICIONADO
 builder.Services.AddScoped<ICepService, ViaCepAdapter>(); // <<< ADICIONADO
 
 // =======================================================
-
+// == 5. ADIÇÃO DO PADRÃO BUILDER ==
+// =======================================================
+// Registra o builder com um ciclo de vida "Scoped", 
+// o que significa que um novo builder é criado a cada requisição HTTP.
+builder.Services.AddScoped<IUsuarioBuilder, UsuarioBuilder>();
+// =======================================================
 
 var app = builder.Build();
 

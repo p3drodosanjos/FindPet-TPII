@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
-using FindPet.Models; // <<< CORRIGIDO: Deve ser "FindPet" (F maiúsculo)
-using FindPet.Interfaces; // <<< ADICIONADO: Para usar o ICepService
-using System.Threading.Tasks; // <<< ADICIONADO: Para usar 'async Task'
+using FindPet.Models;      // Para TelaCadastro2 e TelaCadastroModel
+using FindPet.Interfaces;  // Para IUsuarioBuilder e ICepService
+using FindPet.Services;    // Para UsuarioService
+using Newtonsoft.Json;     // Para deserializar o TempData
+using System.Threading.Tasks;
 
 namespace FindPet.Controllers // <<< CORRIGIDO: Deve ser "FindPet" (F maiúsculo)
 {

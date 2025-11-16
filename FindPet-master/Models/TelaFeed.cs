@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
-using findPet.Interfaces;
+using System.Collections.Generic;
+using System;
 
 namespace findPet.Models
 {
@@ -19,6 +20,9 @@ namespace findPet.Models
         public List<Comentario> Comentarios { get; set; } = new List<Comentario>();
         public int Compartilhamentos { get; set; } = 0;
         public DateTime DataPublicacao { get; set; } = DateTime.Now;
+
+        // --- LINHA ADICIONADA ---
+        public string TipoAnuncio { get; set; } = string.Empty;
     }
 
     public class Comentario
@@ -32,9 +36,8 @@ namespace findPet.Models
     public class InteracaoModel
     {
         public int PublicacaoId { get; set; }
-        public string TipoInteracao { get; set; } = string.Empty; // "curtir", "comentar", "compartilhar"
+        public string TipoInteracao { get; set; } = string.Empty; 
         public string TextoComentario { get; set; } = string.Empty;
         public string NomeUsuario { get; set; } = string.Empty;
     }
 }
-

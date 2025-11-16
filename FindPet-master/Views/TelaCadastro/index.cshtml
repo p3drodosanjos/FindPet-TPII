@@ -27,12 +27,17 @@
         <img class="gato" src="/imagem/gatoroxo.png" alt="Gato">
     </div>
 
+    <form asp-controller="TelaCadastro" asp-action="Create" method="post">
+
+    </form>
+
     <form id="form-cadastro" class="form-container">
         <div class="form-text">
             <h2>Cadastre-se</h2>
         </div>
         <hr class="divider" />
 
+    <div asp-validation-summary="All" class="text-danger"></div>
     
     <div class="form-row">
             <div class="form-group">

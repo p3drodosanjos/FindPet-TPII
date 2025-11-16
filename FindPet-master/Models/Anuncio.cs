@@ -1,7 +1,7 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace FindPet.Models
+namespace findPet.Models
 {
     // Classe base/abstrata (o "Produto" do Factory Method)
     public abstract class AnuncioModel

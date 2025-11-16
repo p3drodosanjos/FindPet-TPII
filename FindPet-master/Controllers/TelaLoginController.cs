@@ -10,20 +10,20 @@ namespace findPet.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Validação das credenciais do usuário
+                // Validaï¿½ï¿½o das credenciais do usuï¿½rio
                 bool usuarioValido = ValidarUsuario(model.Email, model.Senha);
 
                 if (usuarioValido)
                 {
-                    // Redireciona para o dashboard ou página inicial após o login bem-sucedido
+                    // Redireciona para o dashboard ou pï¿½gina inicial apï¿½s o login bem-sucedido
                     return RedirectToAction("Dashboard", "Home");
                 }
 
-                // Mensagem de erro para credenciais inválidas
-                ModelState.AddModelError(string.Empty, "Email ou senha inválidos.");
+                // Mensagem de erro para credenciais invï¿½lidas
+                ModelState.AddModelError(string.Empty, "Email ou senha invï¿½lidos.");
             }
 
-            // Retorna à tela de login com mensagens de erro
+            // Retorna ï¿½ tela de login com mensagens de erro
             return View("Index", model);
         }
 
@@ -36,8 +36,8 @@ namespace findPet.Controllers
 
         private bool ValidarUsuario(string email, string senha)
         {
-            // Aqui você implementa a lógica de validação (banco de dados ou serviço externo)
-            // Exemplo: Login válido com email e senha fixos para simulação
+            // Aqui vocï¿½ implementa a lï¿½gica de validaï¿½ï¿½o (banco de dados ou serviï¿½o externo)
+            // Exemplo: Login vï¿½lido com email e senha fixos para simulaï¿½ï¿½o
             return email == "teste@exemplo.com" && senha == "senha123";
         }
     }

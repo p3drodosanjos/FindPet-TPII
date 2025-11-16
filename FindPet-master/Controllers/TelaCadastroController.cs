@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using FindPet.Models; // <<< CORRIGIDO (de 'findPet' para 'FindPet')
+using Newtonsoft.Json;
 
 namespace FindPet.Controllers // <<< CORRIGIDO (de 'findPet' para 'FindPet')
 {
@@ -20,16 +21,5 @@ namespace FindPet.Controllers // <<< CORRIGIDO (de 'findPet' para 'FindPet')
             return RedirectToAction("Index", "TelaCadastro2");
         }
 
-        [HttpPost]
-        public IActionResult Index(TelaCadastroModel model) // <<< CORRIGIDO (de 'telaCadastroModel' para 'TelaCadastroModel')
-        {
-            if (ModelState.IsValid)
-            {
-                // Aqui você pode processar os dados do formulário da TelaCadastro
-                return RedirectToAction("Index", "TelaCadastro2"); // Redireciona para a próxima etapa
-            }
-
-            return View();
-        }
     }
 }
