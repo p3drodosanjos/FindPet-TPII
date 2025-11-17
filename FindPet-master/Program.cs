@@ -63,7 +63,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();
-app.MapControllers(); // Essencial para suas API Controllers (como UsuariosController)
+app.MapControllers(); /// Essencial para suas API Controllers (como UsuariosController)
 
 // Rota padrão aponta para TelaLogin
 app.MapControllerRoute(
